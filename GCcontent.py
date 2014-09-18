@@ -5,10 +5,12 @@
 
 #percent GC content = 100 * (number of "C"s + number of "G"s) / (length of sequence)
 
-
-import re
 from collections import defaultdict
 import numpy as np
+import random, re
+#For info about the Binomial distribution
+#http://docs.scipy.org/doc/numpy/reference/generated/numpy.random.binomial.html
+
 
 #A = 1
 #T = 2
@@ -17,12 +19,15 @@ import numpy as np
 
 
 def main():
-	N = 3000000
+	#n is the number of trials
+	n = 30000
+	#p is the probability of success
+	p = random.uniform(0.01, 0.99)
 
-	print 'Random DNA sequence content %s out of %i bases' % (randomSeq(N), N)
+	print 'Percent of GC in the sequence %s of out of %i bases' % (randomSeq(n, p), n)
 
-def randomSeq(N):
-	dnaSeq = np.random.randint(1, 5, size=(N))
+def randomSeq(n, p):
+	dnaSeq = np.random.binomial(4,  p, n)
 	return "%.03f" % (100 * (np.count_nonzero(np.where(dnaSeq==3)) + np.count_nonzero(np.where(dnaSeq==4))) / float(len(dnaSeq)))
 
 if __name__ == '__main__':
