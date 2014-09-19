@@ -1,6 +1,6 @@
-import re
-from collections import defaultdict
 import numpy as np
+import random
+
 
 #A = 1
 #T = 2
@@ -8,33 +8,35 @@ import numpy as np
 #C = 4
 
 def main():
-	N = 30000
-	randomDNA = randomSeq(N)
+	N = 300000
+	P = random.uniform(0.01, 0.99)
+	aminoAcid = randomSeq(N, P)
+	print '%s:\t%s\t%s' % ('AAcid Code', 'Count', 'Percent')
+	print '*' * 31
 
-	print '%s:\t%s' % ('AAcid Code', 'Count')
-	print '*' * 22
+	total = 0
+	percent = 0
+	for amino_code in set(aminoAcid):
+		total += aminoAcid.count(amino_code)
+		percent += (aminoAcid.count(amino_code) / float(N) * 100.0)
+		print '%s:\t\t%s\t%.02f p' % (amino_code, aminoAcid.count(amino_code), (aminoAcid.count(amino_code) / float(N) * 100.0))
 
-	for amino_code in set(randomDNA):
-		print '%s:\t\t%s' % (amino_code, randomDNA.count(amino_code))
+	print '*' * 31
+	print '%s:\t%s\t%.01f' % ('Total bases', total, percent) 
 
-def randomSeq(N):
+def randomSeq(N, P):
 	NestedAminoDic = fileToDic()
-	aminoAcidList = []
-	dnaSeq = np.random.randint(1, 5, size=(N, 3))
-
-	for codon in np.dot(dnaSeq, [100, 10, 1]):
-		for amino, output_codons in NestedAminoDic.items():
-			if codon in output_codons:
-				aminoAcidList.append(amino)
-	return aminoAcidList
+	dnaSeq = np.dot(np.random.randint(1, 5, size=(N, 3)), [100, 10, 1])
+	return [NestedAminoDic[k] for k in dnaSeq ]
 
 def fileToDic():
 	dataFile = open('aminonumber.csv')
-	amicoDic = defaultdict(list)
-	removeEndings = re.compile('[\r\n\t]')
+	amicoDic = {}
 	for index, line in enumerate(dataFile.readlines()):
 		if index > 0:
-			amicoDic[line.split(',')[0]].append(int(removeEndings.sub('', line.split(',')[1])))
+			value = line.split(',')[0]
+			key = int(line.split(',')[1])
+			amicoDic[key] = value
 	dataFile.close()
 	return amicoDic
 
